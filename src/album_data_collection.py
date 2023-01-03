@@ -13,6 +13,7 @@ class AlbumData:
         self._album_name = None
         self._artist_id = None
         self._artist_name = None
+        self._artist_genres = []
         self._track_names = []
         self._release_date = None
         self._record_company = None
@@ -55,6 +56,19 @@ class AlbumData:
         artist = album["artists"][0]
 
         self._artist_name = artist["name"]
+
+    def get_artist_genres(self) -> None:
+        """
+        Queries artist for genres and stores it as a list of strings.
+        """
+        artist = spotify.artist(self._artist_id)
+        genres = artist["genres"]
+
+        for genre in genres:
+
+            genre = genre.capitalize()
+
+            self._artist_genres.append(genre)
 
     def get_track_names(self) -> None:
         """
@@ -115,9 +129,11 @@ class AlbumData:
         print(f"Album name: {self._album_name}")
         print(f"Artist ID: {self._artist_id}")
         print(f"Artist name: {self._artist_name}")
+        print(f"Artist genres: {self._artist_genres}")
         print(f"Album track names: {self._track_names}")
         print(f"Album release date: {self._release_date}")
         print(f"Record company: {self._record_company}")
+        print(f"Album cover url: {self._album_cover_image_url}")
         print(f"Album cover file path: {self._album_cover_path}")
         print()
 
@@ -129,6 +145,7 @@ def main():
     data.get_album_name()
     data.get_artist_id()
     data.get_artist_name()
+    data.get_artist_genres()
     data.get_track_names()
     data.get_release_date()
     data.get_record_company()

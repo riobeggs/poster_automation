@@ -1,4 +1,6 @@
+import os
 import spotipy
+import urllib.request
 
 from credentials import client_credentials_manager
 
@@ -14,7 +16,8 @@ class AlbumData:
         self._track_names = []
         self._release_date = None
         self._record_company = None
-        self._album_cover = None
+        self._album_cover_image_url = None
+        self._album_cover_path = None
 
     def get_album_id(self) -> None:
         """
@@ -23,7 +26,7 @@ class AlbumData:
         # album_url = input("Album link: ")
 
         # Remove after testing ---------------------------------------------------------------------->
-        album_url = "https://open.spotify.com/album/2mpzeA7pHNIDAPii4EEKsB?si=UXtfaj3ORzSSiOREq6a__A"
+        album_url = "https://open.spotify.com/album/79dL7FLiJFOO0EoehUHQBv?si=MM4_i0vQQVKBdMtOxWD-zQ"
         # ------------------------------------------------------------------------------------------->
         self._album_id = album_url.split("/")[-1].split("?")[0]
 
@@ -80,11 +83,28 @@ class AlbumData:
 
         self._record_company = record_company["text"]
 
-    def get_album_cover(self) -> None:
+    def get_album_cover_path(self) -> None:
         """
-        Queries album for album covers URL and stores it as a string.
-        Downloads the image as a tmp file.
+        Queries album for album covers URL,
+        downloads the image and stores the file path as a string.
         """
+        album = spotify.album(self._album_id)
+        images = album["images"][0]
+
+        self._album_cover_image_url = images["url"]
+        self._album_cover_path = f"covers/{self._album_id}.jpg"
+
+        self.download_album_cover()
+
+    def download_album_cover(self) -> None:
+        """
+        Downloads the album cover image to covers folder.
+        Creates covers folder if not already created.
+        """
+        if not os.path.exists("covers"):
+            os.mkdir("covers")
+
+        urllib.request.urlretrieve(self._album_cover_image_url, self._album_cover_path)
 
     def display(self) -> None:
         """
@@ -98,7 +118,7 @@ class AlbumData:
         print(f"Album track names: {self._track_names}")
         print(f"Album release date: {self._release_date}")
         print(f"Record company: {self._record_company}")
-        print(f"Album cover file path: {self._album_cover}")
+        print(f"Album cover file path: {self._album_cover_path}")
         print()
 
 
@@ -112,7 +132,7 @@ def main():
     data.get_track_names()
     data.get_release_date()
     data.get_record_company()
-    data.get_album_cover()
+    data.get_album_cover_path()
 
     data.display()
 

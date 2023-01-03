@@ -1,11 +1,7 @@
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
 
-# TODO replace hardcoded credentials
-client_credentials_manager = SpotifyClientCredentials(
-    client_id="e8369a887cbd4aca9b8ff904ff0708da",
-    client_secret="6bb3ca55be584ef2b03d735d35022165",
-)
+from credentials import client_credentials_manager
+
 spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
@@ -14,6 +10,7 @@ class AlbumData:
         self._album = None
         self._artist_name = None
         self._album_name = None
+        self._album_cover = None
         self._release_date = None
         self._track_names = []
         self._record_company = None

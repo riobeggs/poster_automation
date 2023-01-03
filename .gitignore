@@ -1,2 +1,4 @@
 .venv
 .cache
+credentials.py
+__pycache__

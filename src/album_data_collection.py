@@ -12,9 +12,9 @@ class AlbumData:
         self._artist_id = None
         self._artist_name = None
         self._track_names = []
-        self._album_cover = None
         self._release_date = None
         self._record_company = None
+        self._album_cover = None
 
     def get_album_id(self) -> None:
         """
@@ -63,6 +63,29 @@ class AlbumData:
 
             self._track_names.append(track["name"])
 
+    def get_release_date(self) -> None:
+        """
+        Queries album for release date and stores it as a string.
+        """
+        album = spotify.album(self._album_id)
+
+        self._release_date = album["release_date"]
+
+    def get_record_company(self) -> None:
+        """
+        Queries album for record company and stores it as a string.
+        """
+        album = spotify.album(self._album_id)
+        record_company = album["copyrights"][0]
+
+        self._record_company = record_company["text"]
+
+    def get_album_cover(self) -> None:
+        """
+        Queries album for album covers URL and stores it as a string.
+        Downloads the image as a tmp file.
+        """
+
     def display(self) -> None:
         """
         Displays data collected (used for testing)
@@ -73,15 +96,23 @@ class AlbumData:
         print(f"Artist ID: {self._artist_id}")
         print(f"Artist name: {self._artist_name}")
         print(f"Album track names: {self._track_names}")
+        print(f"Album release date: {self._release_date}")
+        print(f"Record company: {self._record_company}")
+        print(f"Album cover file path: {self._album_cover}")
         print()
+
 
 def main():
     data = AlbumData()
+
     data.get_album_id()
     data.get_album_name()
     data.get_artist_id()
     data.get_artist_name()
     data.get_track_names()
+    data.get_release_date()
+    data.get_record_company()
+    data.get_album_cover()
 
     data.display()
 

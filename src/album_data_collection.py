@@ -57,19 +57,33 @@ class AlbumData:
         """
         Appends each tracks name from the album to a list of strings
         """
-        for track in self._album:
+        album = spotify.album_tracks(self._album_id)["items"]
+
+        for track in album:
 
             self._track_names.append(track["name"])
 
+    def display(self) -> None:
+        """
+        Displays data collected (used for testing)
+        """
+        print()
+        print(f"Album ID: {self._album_id}")
+        print(f"Album name: {self._album_name}")
+        print(f"Artist ID: {self._artist_id}")
+        print(f"Artist name: {self._artist_name}")
+        print(f"Album track names: {self._track_names}")
+        print()
 
 def main():
     data = AlbumData()
-
     data.get_album_id()
     data.get_album_name()
-
     data.get_artist_id()
     data.get_artist_name()
+    data.get_track_names()
+
+    data.display()
 
 
 if __name__ == "__main__":

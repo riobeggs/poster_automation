@@ -3,6 +3,7 @@ import spotipy
 import urllib.request
 
 from credentials import client_credentials_manager
+from Pylette import extract_colors
 
 spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
@@ -19,6 +20,7 @@ class AlbumData:
         self._record_company = None
         self._album_cover_image_url = None
         self._album_cover_path = None
+        self._colour_palette = []
 
     def get_album_id(self) -> None:
         """
@@ -27,7 +29,7 @@ class AlbumData:
         # album_url = input("Album link: ")
 
         # Remove after testing ---------------------------------------------------------------------->
-        album_url = "https://open.spotify.com/album/79dL7FLiJFOO0EoehUHQBv?si=MM4_i0vQQVKBdMtOxWD-zQ"
+        album_url = "https://open.spotify.com/album/2mpzeA7pHNIDAPii4EEKsB?si=7rnnAkzuT1mbT3AyJgSkCQ"
         # ------------------------------------------------------------------------------------------->
         self._album_id = album_url.split("/")[-1].split("?")[0]
 
@@ -120,6 +122,13 @@ class AlbumData:
 
         urllib.request.urlretrieve(self._album_cover_image_url, self._album_cover_path)
 
+    def get_colours_from_album_cover(self) -> None:
+        """
+        Uses Pylette to generate a 5 colour palette from the album cover.
+        Stores the rgb values as a list of strings.
+        """
+        self._colour_palette = extract_colors(self._album_cover_path, 5, True)
+
     def display(self) -> None:
         """
         Displays data collected (used for testing)
@@ -135,6 +144,7 @@ class AlbumData:
         print(f"Record company: {self._record_company}")
         print(f"Album cover url: {self._album_cover_image_url}")
         print(f"Album cover file path: {self._album_cover_path}")
+        print(f"Colour palette: {self._colour_palette}")
         print()
 
 
@@ -150,6 +160,7 @@ def main():
     data.get_release_date()
     data.get_record_company()
     data.get_album_cover_path()
+    data.get_colours_from_album_cover()
 
     data.display()
 

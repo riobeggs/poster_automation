@@ -1,9 +1,11 @@
+import calendar
 import os
-import spotipy
 import urllib.request
 
+import spotipy
+from colorthief import ColorThief
+
 from credentials import client_credentials_manager
-from Pylette import extract_colors
 
 spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
@@ -87,8 +89,13 @@ class AlbumData:
         Queries album for release date and stores it as a string.
         """
         album = spotify.album(self._album_id)
+        date = album["release_date"]
 
-        self._release_date = album["release_date"]
+        date = date.split("-")
+        date[1] = calendar.month_name[int(date[1])]
+        date = f"{date[2]} {date[1]} {date[0]}"
+
+        self._release_date = date
 
     def get_record_company(self) -> None:
         """
@@ -124,25 +131,31 @@ class AlbumData:
 
     def get_colours_from_album_cover(self) -> None:
         """
-        Uses Pylette to generate a 5 colour palette from the album cover.
-        Stores the rgb values as a list of strings.
+        Uses colour thief to generate a 5 colour palette from the album cover.
+        Stores the hex values as strings in a list.
         """
-        self._colour_palette = extract_colors(self._album_cover_path, 5, True)
+        rgb_palette = ColorThief(self._album_cover_path).get_palette(5)
+
+        for colour in rgb_palette:
+
+            hex_colour = f"{colour[0]:02x}{colour[1]:02x}{colour[2]:02x}"
+
+            self._colour_palette.append(hex_colour)
 
     def display(self) -> None:
         """
         Displays data collected (used for testing)
         """
         print()
-        print(f"Album ID: {self._album_id}")
+        # print(f"Album ID: {self._album_id}")
         print(f"Album name: {self._album_name}")
-        print(f"Artist ID: {self._artist_id}")
+        # print(f"Artist ID: {self._artist_id}")
         print(f"Artist name: {self._artist_name}")
         print(f"Artist genres: {self._artist_genres}")
         print(f"Album track names: {self._track_names}")
         print(f"Album release date: {self._release_date}")
         print(f"Record company: {self._record_company}")
-        print(f"Album cover url: {self._album_cover_image_url}")
+        # print(f"Album cover url: {self._album_cover_image_url}")
         print(f"Album cover file path: {self._album_cover_path}")
         print(f"Colour palette: {self._colour_palette}")
         print()

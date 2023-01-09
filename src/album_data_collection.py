@@ -16,7 +16,7 @@ class AlbumData:
         self._album_name = None
         self._artist_id = None
         self._artist_name = None
-        self._artist_genres = []
+        self._artist_genre = None
         self._track_names = []
         self._release_date = None
         self._record_company = None
@@ -61,18 +61,16 @@ class AlbumData:
 
         self._artist_name = artist["name"]
 
-    def get_artist_genres(self) -> None:
+    def get_artist_genre(self) -> None:
         """
-        Queries artist for genres and stores it as a list of strings.
+        Queries artist for genres and stores main genre as a string.
         """
         artist = spotify.artist(self._artist_id)
+
         genres = artist["genres"]
+        genre = genres[0]
 
-        for genre in genres:
-
-            genre = genre.capitalize()
-
-            self._artist_genres.append(genre)
+        self._artist_genre = genre.capitalize()
 
     def get_track_names(self) -> None:
         """
@@ -151,7 +149,7 @@ class AlbumData:
         print(f"Album name: {self._album_name}")
         # print(f"Artist ID: {self._artist_id}")
         print(f"Artist name: {self._artist_name}")
-        print(f"Artist genres: {self._artist_genres}")
+        print(f"Artist genre: {self._artist_genre}")
         print(f"Album track names: {self._track_names}")
         print(f"Album release date: {self._release_date}")
         print(f"Record company: {self._record_company}")
@@ -168,7 +166,7 @@ class AlbumData:
         self.get_album_name()
         self.get_artist_id()
         self.get_artist_name()
-        self.get_artist_genres()
+        self.get_artist_genre()
         self.get_track_names()
         self.get_release_date()
         self.get_record_company()
@@ -185,7 +183,7 @@ def main():
     data.get_album_name()
     data.get_artist_id()
     data.get_artist_name()
-    data.get_artist_genres()
+    data.get_artist_genre()
     data.get_track_names()
     data.get_release_date()
     data.get_record_company()

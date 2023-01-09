@@ -5,7 +5,7 @@ import urllib.request
 import spotipy
 from colorthief import ColorThief
 
-from credentials import client_credentials_manager
+from .credentials import client_credentials_manager
 
 spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
@@ -28,10 +28,10 @@ class AlbumData:
         """
         Locates an albums id from the album URL given by the user.
         """
-        # album_url = input("Album link: ")
+        album_url = input("\nAlbum link: ")
 
         # Remove after testing ---------------------------------------------------------------------->
-        album_url = "https://open.spotify.com/album/2mpzeA7pHNIDAPii4EEKsB?si=7rnnAkzuT1mbT3AyJgSkCQ"
+        # album_url = "https://open.spotify.com/album/2mpzeA7pHNIDAPii4EEKsB?si=7rnnAkzuT1mbT3AyJgSkCQ"
         # ------------------------------------------------------------------------------------------->
         self._album_id = album_url.split("/")[-1].split("?")[0]
 
@@ -159,6 +159,23 @@ class AlbumData:
         print(f"Album cover file path: {self._album_cover_path}")
         print(f"Colour palette: {self._colour_palette}")
         print()
+
+    def run(self) -> None:
+        """
+        Runs methods for retrieving relative data.
+        """
+        self.get_album_id()
+        self.get_album_name()
+        self.get_artist_id()
+        self.get_artist_name()
+        self.get_artist_genres()
+        self.get_track_names()
+        self.get_release_date()
+        self.get_record_company()
+        self.get_album_cover_path()
+        self.get_colours_from_album_cover()
+
+        self.display()
 
 
 def main():

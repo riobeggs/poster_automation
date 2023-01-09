@@ -1,16 +1,11 @@
 async-timeout==4.0.2
 certifi==2022.12.7
 charset-normalizer==2.1.1
+colorthief==0.2.1
 idna==3.4
-joblib==1.2.0
-numpy==1.24.1
 Pillow==9.4.0
-Pylette==0.4
 redis==4.4.1
 requests==2.28.1
-scikit-learn==1.2.0
-scipy==1.10.0
 six==1.16.0
 spotipy==2.22.0
-threadpoolctl==3.1.0
 urllib3==1.26.13

@@ -1,4 +1,5 @@
 import calendar
+import csv
 import os
 import urllib.request
 
@@ -140,6 +141,40 @@ class AlbumData:
 
             self._colour_palette.append(hex_colour)
 
+    def create_csv(self) -> None:
+        """
+        Creates a csv file containing relative data about the album.
+        """
+        columns = [
+            "album_name",
+            "artist_name",
+            "tracks",
+            "genre",
+            "date",
+            "record_company",
+            "album_cover",
+            "colour_palette",
+        ]
+
+        data = [
+            self._album_name,
+            self._artist_name,
+            self._track_names,
+            self._artist_genre,
+            self._release_date,
+            self._record_company,
+            self._album_cover_path,
+            self._colour_palette,
+        ]
+
+        with open(
+            f"csv_files/{self._album_id}.csv", "w", encoding="UTF8", newline=""
+        ) as f:
+            writer = csv.writer(f)
+
+            writer.writerow(columns)
+            writer.writerow(data)
+
     def display(self) -> None:
         """
         Displays data collected (used for testing)
@@ -172,6 +207,7 @@ class AlbumData:
         self.get_record_company()
         self.get_album_cover_path()
         self.get_colours_from_album_cover()
+        self.create_csv()
 
         self.display()
 
@@ -189,6 +225,7 @@ def main():
     data.get_record_company()
     data.get_album_cover_path()
     data.get_colours_from_album_cover()
+    data.create_csv()
 
     data.display()
 

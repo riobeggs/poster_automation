@@ -13,6 +13,9 @@ spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 class AlbumData:
     def __init__(self) -> None:
+        self._album_object = None
+        self._artist_object = None
+
         self._album_id = None
         self._album_name = None
         self._artist_id = None
@@ -36,20 +39,29 @@ class AlbumData:
         # ------------------------------------------------------------------------------------------->
         self._album_id = album_url.split("/")[-1].split("?")[0]
 
+    def create_album_object(self) -> None:
+        """
+        Creates album obejct for querying.
+        """
+        self._album_object = spotify.album(self._album_id)
+
+    def create_artist_object(self) -> None:
+        """
+        Creates artist object for querying.
+        """
+        self._artist_object = spotify.artist(self._artist_id)
+
     def get_album_name(self) -> None:
         """
         Queries album for albums name and stores it as a string.
         """
-        album = spotify.album(self._album_id)
-
-        self._album_name = album["name"]
+        self._album_name = self._album_object["name"]
 
     def get_artist_id(self) -> None:
         """
         Queries album for albums name and stores it as a string.
         """
-        album = spotify.album(self._album_id)
-        artist = album["artists"][0]
+        artist = self._album_object["artists"][0]
 
         self._artist_id = artist["id"]
 
@@ -57,18 +69,13 @@ class AlbumData:
         """
         Queries album for artists name and stores it as a string.
         """
-        album = spotify.album(self._album_id)
-        artist = album["artists"][0]
-
-        self._artist_name = artist["name"]
+        self._artist_name = self._artist_object["name"]
 
     def get_artist_genre(self) -> None:
         """
         Queries artist for genres and stores main genre as a string.
         """
-        artist = spotify.artist(self._artist_id)
-
-        genres = artist["genres"]
+        genres = self._artist_object["genres"]
         genre = genres[0]
 
         self._artist_genre = genre.capitalize()
@@ -77,9 +84,9 @@ class AlbumData:
         """
         Appends each tracks name from the album to a list of strings
         """
-        album = spotify.album_tracks(self._album_id)["items"]
+        tracks = spotify.album_tracks(self._album_id)["items"]
 
-        for track in album:
+        for track in tracks:
 
             self._track_names.append(track["name"])
 
@@ -87,8 +94,7 @@ class AlbumData:
         """
         Queries album for release date and stores it as a string.
         """
-        album = spotify.album(self._album_id)
-        date = album["release_date"]
+        date = self._album_object["release_date"]
 
         date = date.split("-")
         date[1] = calendar.month_name[int(date[1])]
@@ -100,8 +106,7 @@ class AlbumData:
         """
         Queries album for record company and stores it as a string.
         """
-        album = spotify.album(self._album_id)
-        record_company = album["copyrights"][0]
+        record_company = self._album_object["copyrights"][0]
 
         self._record_company = record_company["text"]
 
@@ -110,8 +115,7 @@ class AlbumData:
         Queries album for album covers URL,
         downloads the image and stores the file path as a string.
         """
-        album = spotify.album(self._album_id)
-        images = album["images"][0]
+        images = self._album_object["images"][0]
 
         self._album_cover_image_url = images["url"]
         self._album_cover_path = f"covers/{self._album_id}.jpg"
@@ -145,6 +149,8 @@ class AlbumData:
         """
         Creates a csv file containing relative data about the album.
         """
+        if not os.path.exists("csv_files"):
+            os.mkdir("csv_files")
         columns = [
             "album_name",
             "artist_name",
@@ -198,8 +204,10 @@ class AlbumData:
         Runs methods for retrieving relative data.
         """
         self.get_album_id()
-        self.get_album_name()
+        self.create_album_object()
         self.get_artist_id()
+        self.create_artist_object()
+        self.get_album_name()
         self.get_artist_name()
         self.get_artist_genre()
         self.get_track_names()
@@ -216,8 +224,10 @@ def main():
     data = AlbumData()
 
     data.get_album_id()
-    data.get_album_name()
+    data.create_album_object()
     data.get_artist_id()
+    data.create_artist_object()
+    data.get_album_name()
     data.get_artist_name()
     data.get_artist_genre()
     data.get_track_names()

@@ -5,6 +5,7 @@ import urllib.request
 
 import spotipy
 from colorthief import ColorThief
+from PIL import Image
 
 from .credentials import client_credentials_manager
 
@@ -27,6 +28,11 @@ class AlbumData:
         self._album_cover_image_url = None
         self._album_cover_path = None
         self._colour_palette = []
+        self._colour_1 = None
+        self._colour_2 = None
+        self._colour_3 = None
+        self._colour_4 = None
+        self._colour_5 = None
 
     def get_album_id(self) -> None:
         """
@@ -105,11 +111,17 @@ class AlbumData:
         """
         date = self._album_object["release_date"]
 
-        date = date.split("-")
-        date[1] = calendar.month_name[int(date[1])]
-        date = f"{date[2]} {date[1]} {date[0]}"
+        if self._album_object["release_date_precision"] != "year":
 
-        self._release_date = date.upper()
+            date = date.split("-")
+            date[1] = calendar.month_name[int(date[1])]
+            date = f"{date[2]} {date[1]} {date[0]}"
+
+            self._release_date = date.upper()
+
+        else:
+
+            self._release_date = date
 
     def get_record_company(self) -> None:
         """
@@ -152,9 +164,38 @@ class AlbumData:
 
         for colour in rgb_palette:
 
-            hex_colour = f"{colour[0]:02x}{colour[1]:02x}{colour[2]:02x}"
+            hex_colour = f"#{colour[0]:02x}{colour[1]:02x}{colour[2]:02x}"
 
             self._colour_palette.append(hex_colour)
+
+    def download_colour_palette_images(self) -> None:
+        """
+        Downloads hexcode colours as images as stores their file paths as strings.
+        """
+        if not os.path.exists("colour_palette_img"):
+            os.mkdir("colour_palette_img")
+
+        colour_number = 0
+        paths = []
+
+        for colour in self._colour_palette:
+
+            colour_number += 1
+
+            image_path = f"colour_palette_img/colour_{colour_number}.jpg"
+
+            image = Image.new("RGB", (100, 100), colour)
+            image.save(image_path)
+
+            paths.append(os.path.abspath(image_path))
+
+        (
+            self._colour_1,
+            self._colour_2,
+            self._colour_3,
+            self._colour_4,
+            self._colour_5,
+        ) = (paths[0], paths[1], paths[2], paths[3], paths[4])
 
     def create_csv(self) -> None:
         """
@@ -170,10 +211,12 @@ class AlbumData:
             "date",
             "record_company",
             "album_cover",
+            "colour_1",
+            "colour_2",
+            "colour_3",
+            "colour_4",
+            "colour_5",
         ]
-        #     "album_cover",
-        #     "colour_palette",
-        # ]
 
         data = [
             self._album_name,
@@ -183,10 +226,12 @@ class AlbumData:
             self._release_date,
             self._record_company,
             self._full_album_cover_path,
+            self._colour_1,
+            self._colour_2,
+            self._colour_3,
+            self._colour_4,
+            self._colour_5,
         ]
-        #     self._album_cover_path,
-        #     self._colour_palette,
-        # ]
 
         with open(f"csv_files/album_data.csv", "w", encoding="UTF8", newline="") as f:
             writer = csv.writer(f)
@@ -199,16 +244,16 @@ class AlbumData:
         Displays data collected (used for testing)
         """
         print()
-        # print(f"Album ID: {self._album_id}")
-        # print(f"Album name: {self._album_name}")
-        # # print(f"Artist ID: {self._artist_id}")
-        # print(f"Artist name: {self._artist_name}")
-        # print(f"Artist genre: {self._artist_genre}")
-        # print(f"Album track names: {self._track_names}")
-        # print(f"Album release date: {self._release_date}")
-        # print(f"Record company: {self._record_company}")
-        # # print(f"Album cover url: {self._album_cover_image_url}")
-        # print(f"Full album cover file path: {self._full_album_cover_path}")
+        print(f"Album ID: {self._album_id}")
+        print(f"Album name: {self._album_name}")
+        # print(f"Artist ID: {self._artist_id}")
+        print(f"Artist name: {self._artist_name}")
+        print(f"Artist genre: {self._artist_genre}")
+        print(f"Album track names: {self._track_names}")
+        print(f"Album release date: {self._release_date}")
+        print(f"Record company: {self._record_company}")
+        # print(f"Album cover url: {self._album_cover_image_url}")
+        print(f"Full album cover file path: {self._full_album_cover_path}")
         print(f"Colour palette: {self._colour_palette}")
         print()
 
@@ -228,9 +273,10 @@ class AlbumData:
         self.get_record_company()
         self.get_album_cover_path()
         self.get_colours_from_album_cover()
+        self.download_colour_palette_images()
         self.create_csv()
 
-        self.display()
+        # self.display()
 
 
 def main():
@@ -248,9 +294,10 @@ def main():
     data.get_record_company()
     data.get_album_cover_path()
     data.get_colours_from_album_cover()
+    data.download_colour_palette_images()
     data.create_csv()
 
-    data.display()
+    # data.display()
 
 
 if __name__ == "__main__":

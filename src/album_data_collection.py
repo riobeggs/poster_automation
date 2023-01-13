@@ -21,7 +21,7 @@ class AlbumData:
         self._artist_id = None
         self._artist_name = None
         self._artist_genre = None
-        self._track_names = []
+        self._track_names = None
         self._release_date = None
         self._record_company = None
         self._album_cover_image_url = None
@@ -55,7 +55,7 @@ class AlbumData:
         """
         Queries album for albums name and stores it as a string.
         """
-        self._album_name = self._album_object["name"]
+        self._album_name = self._album_object["name"].upper()
 
     def get_artist_id(self) -> None:
         """
@@ -69,7 +69,7 @@ class AlbumData:
         """
         Queries album for artists name and stores it as a string.
         """
-        self._artist_name = self._artist_object["name"]
+        self._artist_name = self._artist_object["name"].upper()
 
     def get_artist_genre(self) -> None:
         """
@@ -78,17 +78,26 @@ class AlbumData:
         genres = self._artist_object["genres"]
         genre = genres[0]
 
-        self._artist_genre = genre.capitalize()
+        self._artist_genre = genre.title()
 
     def get_track_names(self) -> None:
         """
-        Appends each tracks name from the album to a list of strings
+        Creates a string with ordered track names separated by "/n"
         """
         tracks = spotify.album_tracks(self._album_id)["items"]
+        track_names = []
+        track_number = 0
 
         for track in tracks:
 
-            self._track_names.append(track["name"])
+            track_number += 1
+            track_name = track["name"].upper()
+
+            track = f"{track_number}. {track_name}"
+
+            track_names.append(track)
+
+        self._track_names = "\n".join(track_names)
 
     def get_release_date(self) -> None:
         """
@@ -100,7 +109,7 @@ class AlbumData:
         date[1] = calendar.month_name[int(date[1])]
         date = f"{date[2]} {date[1]} {date[0]}"
 
-        self._release_date = date
+        self._release_date = date.upper()
 
     def get_record_company(self) -> None:
         """
@@ -118,9 +127,11 @@ class AlbumData:
         images = self._album_object["images"][0]
 
         self._album_cover_image_url = images["url"]
-        self._album_cover_path = f"covers/{self._album_id}.jpg"
+        self._album_cover_path = f"covers/album_cover.jpg"
 
         self.download_album_cover()
+
+        self._full_album_cover_path = os.path.abspath(self._album_cover_path)
 
     def download_album_cover(self) -> None:
         """
@@ -159,8 +170,10 @@ class AlbumData:
             "date",
             "record_company",
             "album_cover",
-            "colour_palette",
         ]
+        #     "album_cover",
+        #     "colour_palette",
+        # ]
 
         data = [
             self._album_name,
@@ -169,13 +182,13 @@ class AlbumData:
             self._artist_genre,
             self._release_date,
             self._record_company,
-            self._album_cover_path,
-            self._colour_palette,
+            self._full_album_cover_path,
         ]
+        #     self._album_cover_path,
+        #     self._colour_palette,
+        # ]
 
-        with open(
-            f"csv_files/{self._album_id}.csv", "w", encoding="UTF8", newline=""
-        ) as f:
+        with open(f"csv_files/album_data.csv", "w", encoding="UTF8", newline="") as f:
             writer = csv.writer(f)
 
             writer.writerow(columns)
@@ -187,15 +200,15 @@ class AlbumData:
         """
         print()
         # print(f"Album ID: {self._album_id}")
-        print(f"Album name: {self._album_name}")
-        # print(f"Artist ID: {self._artist_id}")
-        print(f"Artist name: {self._artist_name}")
-        print(f"Artist genre: {self._artist_genre}")
-        print(f"Album track names: {self._track_names}")
-        print(f"Album release date: {self._release_date}")
-        print(f"Record company: {self._record_company}")
-        # print(f"Album cover url: {self._album_cover_image_url}")
-        print(f"Album cover file path: {self._album_cover_path}")
+        # print(f"Album name: {self._album_name}")
+        # # print(f"Artist ID: {self._artist_id}")
+        # print(f"Artist name: {self._artist_name}")
+        # print(f"Artist genre: {self._artist_genre}")
+        # print(f"Album track names: {self._track_names}")
+        # print(f"Album release date: {self._release_date}")
+        # print(f"Record company: {self._record_company}")
+        # # print(f"Album cover url: {self._album_cover_image_url}")
+        # print(f"Full album cover file path: {self._full_album_cover_path}")
         print(f"Colour palette: {self._colour_palette}")
         print()
 
